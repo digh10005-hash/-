@@ -457,7 +457,7 @@
   </div>
 
 <!-- 6번 문항 기타 선택 주관식 내용 입력 함수 -->
-<script>
+	<script>
     function toggleQ6Other(isOtherSelected) {
       const otherInput = document.getElementById('q6_other_text');
       if (isOtherSelected) {
@@ -489,6 +489,26 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    
+    // 설문제출 기한 제한
+		document.addEventListener('DOMContentLoaded', () => {
+    	const submitBtn = document.getElementById('submit-btn');
+      const now = new Date();
+      const startTime = new Date('2026-10-15T15:00:00');
+      const endTime = new Date('2026-10-15T18:00:00');
+        
+        if (now < startTime) {
+        		submitBtn.disabled = true;
+          	submitBtn.innerText = '설문 제출은 10월 15일 15시부터 가능합니다.';
+          	submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+          	submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+    			} else if (now > endTime) {
+          	submitBtn.disabled = true;
+            submitBtn.innerText = '설문 기간이 종료되었습니다.';
+          	submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+          }
+        });
 
     // 설문 제출
     document.getElementById('survey-form').addEventListener('submit', async (e) => {
