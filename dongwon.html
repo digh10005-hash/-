@@ -44,7 +44,7 @@
                 <tr class="bg-white">
                   <td rowspan="3" class="border border-gray-300 p-2 font-bold">10. 13.(화)<br>(1일차)</td>
                   <td class="border border-gray-300 p-2">08:30~12:00</td>
-                  <td class="border border-gray-300 p-2 text-left">인도인접<br>※12:00까지 입소허용</td>
+                  <td class="border border-gray-300 p-2 text-left">인도인접<br>※12:00까지 입소허용<br>※인도인접 간 신분증 지참 필수</td>
                   <td class="border border-gray-300 p-2">위병소</td>
                 </tr>
                 <tr class="bg-white">
@@ -204,7 +204,7 @@
            			<table class="w-full text-xs text-center border-collapse border border-gray-300 min-w-[400px]">
              			<thead class="bg-gray-200 font-bold">
                				<tr>
-                  			<th class="border border-gray-300 p-2 w-18">구 분</th>
+                  			<th class="border border-gray-300 p-2 w-20">구 분</th>
                   			<th class="border border-gray-300 p-2 w-20">30Km 이하</th>
                   			<th class="border border-gray-300 p-2 w-20">31~40Km</th>
                   			<th class="border border-gray-300 p-2 w-20">41~50Km</th>
@@ -214,12 +214,12 @@
               			</thead>
              			<tbody>
               		  	<tr class="bg-white">
-              		    	<td rowspan="5" class="border border-gray-300 p-2 font-bold">금 액</td>
-                  			<td class="border border-gray-300 p-2">4,000원</td>
-                  			<td class="border border-gray-300 p-2">5,300원</td>
-                  			<td class="border border-gray-300 p-2">6,600원</td>
-							<td class="border border-gray-300 p-2">8,000원</td>
-							<td class="border border-gray-300 p-2">Km 당 131.82원</td>
+              		    	<td rowspan="5" class="border border-gray-300 p-2 font-bold">금 액<br>(원)</td>
+                  			<td class="border border-gray-300 p-2">4,000</td>
+                  			<td class="border border-gray-300 p-2">5,300</td>
+                  			<td class="border border-gray-300 p-2">6,600</td>
+							<td class="border border-gray-300 p-2">8,000</td>
+							<td class="border border-gray-300 p-2">Km 당<br>131.82</td>
                		 	</tr>
              			</tbody>
            		 	</table>
@@ -457,7 +457,7 @@
   </div>
 
 <!-- 6번 문항 기타 선택 주관식 내용 입력 함수 -->
-<script>
+	<script>
     function toggleQ6Other(isOtherSelected) {
       const otherInput = document.getElementById('q6_other_text');
       if (isOtherSelected) {
@@ -478,17 +478,37 @@
 
     // 데이터베이스 정보
     const firebaseConfig = {
-      apiKey: "ㅇㅇㅇ",
-      authDomain: "ㅇㅇㅇ.firebaseapp.com",
-      projectId: "ㅇㅇㅇ",
-      storageBucket: "ㅇㅇㅇ.firebasestorage.app",
-      messagingSenderId: "ㅇㅇㅇ",
-      appId: "ㅇㅇㅇ"
+      apiKey: "AIzaSyDJitX1TZtHwJlwHhdily603WT0cx_uzZ8",
+      authDomain: "park-2a494.firebaseapp.com",
+      projectId: "park-2a494",
+      storageBucket: "park-2a494.firebasestorage.app",
+      messagingSenderId: "963366778283",
+      appId: "1:963366778283:web:15cfd30be35479a27c4eee"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    
+    // 설문제출 기한 제한
+		document.addEventListener('DOMContentLoaded', () => {
+    	const submitBtn = document.getElementById('submit-btn');
+      const now = new Date();
+      const startTime = new Date('2026-10-15T15:00:00');
+      const endTime = new Date('2026-10-15T18:00:00');
+        
+        if (now < startTime) {
+        		submitBtn.disabled = true;
+          	submitBtn.innerText = '설문 제출은 10월 15일 15시부터 가능합니다.';
+          	submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+          	submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+    			} else if (now > endTime) {
+          	submitBtn.disabled = true;
+            submitBtn.innerText = '설문 기간이 종료되었습니다.';
+          	submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+          }
+        });
 
     // 설문 제출
     document.getElementById('survey-form').addEventListener('submit', async (e) => {
