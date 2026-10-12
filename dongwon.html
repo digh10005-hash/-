@@ -490,54 +490,70 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
     
-    // 설문제출 기한 제한
-		document.addEventListener('DOMContentLoaded', () => {
-    	const submitBtn = document.getElementById('submit-btn');
-      const now = new Date();
-      const startTime = new Date('2026-10-15T15:00:00');
-      const endTime = new Date('2026-10-15T18:00:00');
-        
-        if (now < startTime) {
-        		submitBtn.disabled = true;
-          	submitBtn.innerText = '설문 제출은 10월 15일 15시부터 가능합니다.';
-          	submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-          	submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
-    			} else if (now > endTime) {
-          	submitBtn.disabled = true;
-            submitBtn.innerText = '설문 기간이 종료되었습니다.';
-          	submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-            submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
-          }
-        });
+// 설문 제출 기한 제한
+  document.addEventListener('DOMContentLoaded', () => {
+    const submitBtn = document.getElementById('submit-btn');
 
-    // 설문 제출
-    document.getElementById('survey-form').addEventListener('submit', async (e) => {
-      e.preventDefault(); 
-      const submitBtn = document.getElementById('submit-btn');
+    // 브라우저 기록 확인
+    if (localStorage.getItem('survey_completed') === 'true') {
       submitBtn.disabled = true;
-      submitBtn.innerText = "제출 중...";
+      submitBtn.innerText = '이미 제출이 완료된 설문입니다.';
+      submitBtn.classList.remove('bg-blue-800', 'hover:bg-blue-900');
+      submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+      return; // 이미 제출했다면 아래의 날짜 계산 코드는 아예 실행하지 않고 종료
+    }
 
-      try {
-        await signInAnonymously(auth);
+    const now = new Date();
+    const startTime = new Date('2026-10-15T15:00:00');
+    const endTime = new Date('2026-10-15T18:00:00');
+    
+    if (now < startTime) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = '설문 제출은 10월 15일 15시부터 가능합니다.';
+      submitBtn.classList.remove('bg-blue-800', 'hover:bg-blue-900');
+      submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+    } else if (now > endTime) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = '설문 기간이 종료되었습니다.';
+      submitBtn.classList.remove('bg-blue-800', 'hover:bg-blue-900');
+      submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+    }
+  });
 
-        // 데이터 수집
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-        data.timestamp = serverTimestamp(); // 제출 시간 추가
-        await addDoc(collection(db, "survey_submissions"), data);
+  // 설문 제출
+  document.getElementById('survey-form').addEventListener('submit', async (e) => {
+    e.preventDefault(); 
+    const submitBtn = document.getElementById('submit-btn');
+    
+    submitBtn.disabled = true;
+    submitBtn.innerText = "제출 중...";
 
-        alert("설문이 성공적으로 제출되었습니다. 감사합니다!");
-        document.getElementById('survey-form').reset();
-        window.scrollTo(0, 0); // 제출 후 맨 위로 스크롤
+    try {
+      await signInAnonymously(auth);
 
-      } catch (error) {
-        console.error("데이터 저장 실패: ", error);
-        alert("오류가 발생했습니다: " + error.message);
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      data.timestamp = serverTimestamp(); // 제출 시간 추가
+      await addDoc(collection(db, "survey_submissions"), data);
+
+      alert("설문이 성공적으로 제출되었습니다. 감사합니다!");
+      document.getElementById('survey-form').reset();
+      window.scrollTo(0, 0);
+
+      submitBtn.innerText = "제출완료";
+      submitBtn.classList.remove('bg-blue-800', 'hover:bg-blue-900');
+      submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+
+      localStorage.setItem('survey_completed', 'true');
+
+    } catch (error) {
+      console.error("데이터 저장 실패: ", error);
+      alert("오류가 발생했습니다: " + error.message);
       
-        submitBtn.disabled = false;
-        submitBtn.innerText = "설문 제출하기";
-      }
-    });
+      submitBtn.disabled = false;
+      submitBtn.innerText = "설문 제출하기";
+    }
+  });
   </script>
 </body>
 </html>
