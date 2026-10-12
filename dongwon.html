@@ -533,7 +533,7 @@
       } catch (error) {
         console.error("데이터 저장 실패: ", error);
         alert("오류가 발생했습니다: " + error.message);
-      } finally {
+      
         submitBtn.disabled = false;
         submitBtn.innerText = "설문 제출하기";
       }
